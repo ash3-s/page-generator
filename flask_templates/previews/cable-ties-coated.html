@@ -1,0 +1,19 @@
+{% extends "preview_layout.html" %} {% from 'preview_macros.html' import
+HeaderText, ProductShowcase %} {% block content %}
+<div class="bg-white min-h-screen pb-12">
+  {{ HeaderText(title, "") }} {{ ProductShowcase( images=images, title=title,
+  technicalData=tech_data_image, description=description ) }}
+
+  <section
+    class="lg:px-4 lg:mx-25 lg:px-10 flex flex-col gap-2 mt-10 overflow-x-scroll"
+  >
+    {% for img in table_images %}
+    <img
+      src="{{ img }}"
+      alt="{{ title }} Table"
+      class="min-w-150 lg:max-w-200"
+    />
+    {% endfor %}
+  </section>
+</div>
+{% endblock %}

@@ -1,0 +1,12 @@
+{% extends "preview_layout.html" %} {% from 'preview_macros.html' import
+HeaderText, ProductShowcaseCompareVertical %} {% block content %}
+<div class="bg-white min-h-screen pb-12">
+  {{ HeaderText(title, "") }} {% set raychem_product = { 'id': 'Raychem-RPG',
+  'title': 'Raychem RPG', 'images': raychem.images, 'technicalDataImages':
+  raychem.tech_details, 'specImages': raychem.spec, 'description': '' } %} {%
+  set speedwell_product = { 'id': 'Speedwell', 'title': 'Speedwell', 'images':
+  speedwell.images, 'technicalDataImages': speedwell.tech_details, 'specImages':
+  speedwell.spec, 'description': '' } %} {{
+  ProductShowcaseCompareVertical([raychem_product, speedwell_product]) }}
+</div>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "preview_layout.html" %} {% from 'preview_macros.html' import
+HeaderText, ProductCardGrid %} {% block content %}
+<div class="bg-white min-h-screen pb-12">
+  {{ HeaderText(page_heading, "") }} {% set grid_products = [] %} {% for product
+  in products %} {% set _ = grid_products.append({ 'name': product.name,
+  'description': product.description, 'image_url': product.image_url,
+  'target_page': product.target_page }) %} {% endfor %}
+
+  <div class="flex justify-center items-center py-15">
+    <div
+      class="flex flex-col max-w-sm md:max-w-lg sm:grid sm:grid-cols-3 lg:grid-cols-4 gap-2 justify-center items-center lg:max-w-4xl xl:max-w-7xl"
+    >
+      {{ ProductCardGrid(grid_products) }}
+    </div>
+  </div>
+</div>
+{% endblock %}

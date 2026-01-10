@@ -1,286 +1,421 @@
-{% extends "layout.html" %}
-
-{% block content %}
+{% extends "layout.html" %} {% block content %}
 <div class="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-md">
-    <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-bold">{{ config.name }}</h1>
-        <a href="/" class="text-blue-600 hover:text-blue-800">Back to List</a>
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold">{{ config.name }}</h1>
+    <a href="/" class="text-blue-600 hover:text-blue-800">Back to List</a>
+  </div>
+
+  <form id="generator-form">
+    <div id="form-container" class="space-y-6"></div>
+
+    <div class="mt-8 flex justify-end gap-4">
+      <button
+        type="button"
+        id="preview-page-btn"
+        class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center"
+      >
+        <span id="preview-page-btn-text">Preview Page</span>
+        <div id="preview-page-loader" class="loader ml-3 hidden"></div>
+      </button>
+
+      <button
+        type="button"
+        id="preview-btn"
+        class="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 transition-colors flex items-center"
+      >
+        <span id="preview-btn-text">Preview Code</span>
+        <div id="preview-loader" class="loader ml-3 hidden"></div>
+      </button>
+      <button
+        type="submit"
+        class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center"
+      >
+        <span id="btn-text">Generate Astro File</span>
+        <div id="loader" class="loader ml-3 hidden"></div>
+      </button>
     </div>
-
-    <form id="generator-form">
-        <div id="form-container" class="space-y-6"></div>
-
-        <div class="mt-8 flex justify-end">
-            <button type="submit"
-                class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center">
-                <span id="btn-text">Generate Astro File</span>
-                <div id="loader" class="loader ml-3 hidden"></div>
-            </button>
-        </div>
-    </form>
+  </form>
+  <div id="preview-section" class="mt-8 hidden border-t pt-8">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-xl font-bold">Code Preview</h3>
+      <button
+        type="button"
+        id="copy-preview"
+        class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+      >
+        Copy Code
+      </button>
+    </div>
+    <div class="bg-gray-100 p-4 rounded border overflow-auto max-h-[600px]">
+      <pre><code id="preview-content" class="text-sm font-mono whitespace-pre text-gray-800"></code></pre>
+    </div>
+  </div>
 </div>
 
 <!-- Config Data -->
 <script>
-    const SCHEMA_STRUCTURE = {{ config.structure | tojson }};
-    const TEMPLATE_FILENAME = "{{ filename }}";
+  const SCHEMA_STRUCTURE = {{ config.structure | tojson }};
+  const TEMPLATE_FILENAME = "{{ filename }}";
 </script>
 
 <script>
-    // --- UI/DOM Helpers ---
+  // --- UI/DOM Helpers ---
+  function createFieldLabel(text) {
+    const label = document.createElement("label");
+    label.className = "block text-sm font-medium text-gray-700 mb-1";
+    label.textContent = text;
+    return label;
+  }
 
-    function createFieldLabel(text) {
-        const label = document.createElement('label');
-        label.className = "block text-sm font-medium text-gray-700 mb-1";
-        label.textContent = text;
-        return label;
+  function createInput(type = "text") {
+    const input = document.createElement("input");
+    input.type = type;
+    input.className =
+      "w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 border p-2";
+    return input;
+  }
+
+  // --- Image Upload Handler ---
+  function handleImageUpload(file, inputHidden, previewContainer) {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    previewContainer.innerHTML =
+      '<div class="text-xs text-blue-500">Uploading...</div>';
+
+    fetch("/upload", {
+      method: "POST",
+      body: formData,
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.url) {
+          // Store LOCAL path for preview, let backend handle path conversion for code generation
+          // Actually the backend returns the RELATIVE path usually.
+          // But wait, for visual preview we need the path to be accessible by browser.
+          // The current backend upload_file returns a relative path like "../../../../assets/..."
+          // This won't work for visual preview if we just serve it.
+          // We should make upload return both a web-accessible path (for preview) and a code path.
+
+          // For now, let's assume the upload returns a path that works for code (which is what we have).
+          // But specifically for uploads, we might need to handle this.
+          // The backend currently returns: {'url': project_asset_path, 'filename': file.filename}
+          // AND project_asset_path is relative "../..."
+
+          // HACK: We will store the relative path in the input.
+          // BUT for visual preview to work with local flask server, we need /static/uploads/...
+          // The uploaded file is in /static/uploads.
+
+          // Let's modify the frontend to store the filename as a data attribute maybe?
+          // Or let's just make the preview-page endpoint smart enough to replace paths?
+          // Yes, the clean_paths in preview_page endpoint logic (which we haven't fully written yet, wait we did write it)
+          // actually we wrote preview_page to NOT clean paths.
+          // BUT the input value ALREADY has the relative path "../../../../" because that's what /upload returns.
+
+          // So: We need to fix /upload to return a web-friendly path, OR we need Javascript to know the difference.
+          // Let's simple use the filename for now if we can.
+          // Actually, let's just cheat:
+          // We will rely on the fact that for Visual Preview, we need "/static/uploads/" + filename.
+          // We can construct this in the backend if we detect it.
+          // BUT the frontend puts the value into the hidden input.
+
+          // Okay, let's stick to the plan:
+          // 1. /upload returns the CODE path (relative).
+          // 2. We put that in the input.
+
+          // Issue: When we send this to /preview-page, it has "../../../../assets/img.png".
+          // The browser running the preview page won't find that.
+          // It needs "/static/uploads/img.png".
+
+          // Solution: We need a way to map back.
+          // Since the filename is unique enough, we can likely regex replace in the /preview-page backend.
+          // Or we can just include the filename in the dataset and prefer that?
+
+          // Let's update handleImageUpload to store the web-accessible path in a data attribute.
+          inputHidden.value = data.url;
+          inputHidden.dataset.filename = data.filename; // Store filename for potential use
+
+          previewContainer.innerHTML = `<div class="text-xs text-green-600 mt-1">Uploaded: ${data.filename}</div>`;
+        } else {
+          previewContainer.innerHTML =
+            '<div class="text-xs text-red-500">Upload failed</div>';
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        previewContainer.innerHTML =
+          '<div class="text-xs text-red-500">Error uploading</div>';
+      });
+  }
+
+  // --- Recursive Form Renderer ---
+  function renderField(fieldConfig, container) {
+    const wrapper = document.createElement("div");
+    wrapper.className = "field-wrapper";
+    wrapper.dataset.key = fieldConfig.key;
+    wrapper.dataset.type = fieldConfig.type;
+
+    if (fieldConfig.label) {
+      wrapper.appendChild(createFieldLabel(fieldConfig.label));
     }
 
-    function createInput(type = 'text') {
-        const input = document.createElement('input');
-        input.type = type;
-        input.className = "w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 border p-2";
-        return input;
+    if (fieldConfig.type === "text") {
+      const input = createInput("text");
+      wrapper.appendChild(input);
+      wrapper.dataset.inputElement = "true";
+    } else if (fieldConfig.type === "image" || fieldConfig.type === "file") {
+      const fileInput = createInput("file");
+      const hiddenInput = document.createElement("input");
+      hiddenInput.type = "hidden";
+      const preview = document.createElement("div");
+
+      fileInput.addEventListener("change", (e) => {
+        if (e.target.files[0]) {
+          handleImageUpload(e.target.files[0], hiddenInput, preview);
+        }
+      });
+
+      wrapper.appendChild(fileInput);
+      wrapper.appendChild(hiddenInput);
+      wrapper.appendChild(preview);
+      wrapper.dataset.inputElement = "true";
+    } else if (fieldConfig.type === "checkbox") {
+      const input = document.createElement("input");
+      input.type = "checkbox";
+      input.className =
+        "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded";
+      wrapper.appendChild(input);
+      wrapper.dataset.inputElement = "true";
+    } else if (fieldConfig.type === "object") {
+      const innerContainer = document.createElement("div");
+      innerContainer.className =
+        "pl-4 border-l-2 border-gray-200 mt-2 space-y-4";
+      fieldConfig.fields.forEach((subField) => {
+        renderField(subField, innerContainer);
+      });
+      wrapper.appendChild(innerContainer);
+    } else if (fieldConfig.type === "list") {
+      const listContainer = document.createElement("div");
+      listContainer.className = "space-y-4 mt-2";
+
+      const addItemBtn = document.createElement("button");
+      addItemBtn.type = "button";
+      addItemBtn.className =
+        "text-sm text-blue-600 hover:text-blue-800 font-medium";
+      addItemBtn.textContent =
+        "+ Add " + (fieldConfig.item_schema.label || "Item");
+
+      addItemBtn.onclick = () => {
+        const itemWrapper = document.createElement("div");
+        itemWrapper.className =
+          "relative bg-gray-50 p-4 rounded border border-gray-200 list-item";
+
+        const removeBtn = document.createElement("button");
+        removeBtn.type = "button";
+        removeBtn.className =
+          "absolute top-2 right-2 text-red-500 hover:text-red-700 font-bold";
+        removeBtn.innerHTML = "&times;";
+        removeBtn.onclick = () => itemWrapper.remove();
+
+        itemWrapper.appendChild(removeBtn);
+        renderField(fieldConfig.item_schema, itemWrapper);
+        listContainer.appendChild(itemWrapper);
+      };
+
+      wrapper.appendChild(listContainer);
+      wrapper.appendChild(addItemBtn);
+    }
+    container.appendChild(wrapper);
+  }
+
+  // --- Main Rendering ---
+  const formContainer = document.getElementById("form-container");
+  SCHEMA_STRUCTURE.forEach((field) => {
+    renderField(field, formContainer);
+  });
+
+  // --- Data Collection ---
+  function collectData(container, schema) {
+    if (!container) return null;
+    if (Array.isArray(schema)) {
+      const data = {};
+      schema.forEach((field) => {
+        const wrapper = Array.from(container.children).find(
+          (child) => child.dataset.key === field.key
+        );
+        if (wrapper) {
+          data[field.key] = collectDataFromWrapper(wrapper, field);
+        }
+      });
+      return data;
+    }
+    return null;
+  }
+
+  function collectDataFromWrapper(wrapper, fieldConfig) {
+    if (fieldConfig.type === "text") {
+      return wrapper.querySelector("input").value;
+    }
+    if (fieldConfig.type === "checkbox") {
+      return wrapper.querySelector("input").checked;
+    }
+    if (fieldConfig.type === "image" || fieldConfig.type === "file") {
+      const input = wrapper.querySelector('input[type="hidden"]');
+      // If we are collecting for PREVIEW PAGE, we prefer the local filename if available
+      // But this function is generic.
+      // Let's return a special object? No, the backend expects strings.
+      // We'll stick to returning the value. We will handle the path fixup in the backend
+      // by looking at the string content.
+
+      // Wait, if I have "/static/uploads/foo.png" I can just use that.
+      // But /upload returns relative path.
+
+      // Let's actually change the logic:
+      // If there is a data-filename attribute, it means we just uploaded it.
+      // For the PAGE PREVIEW, we really want "/static/uploads/" + filename.
+
+      // Let's try to return the value as is.
+      // And in the backend `preview_page` route, we will inspect the values and if they look like the relative path format
+      // AND we can find the file in uploads, we map it?
+      // The relative path format we generate is `../../../../assets/filename` or similar.
+      // So we can extract the filename from that.
+
+      return input.value;
+    }
+    if (fieldConfig.type === "object") {
+      const innerContainer = wrapper.querySelector("div.pl-4");
+      return collectData(innerContainer, fieldConfig.fields);
+    }
+    if (fieldConfig.type === "list") {
+      const container = wrapper.querySelector("div.space-y-4");
+      const items = [];
+      Array.from(container.children).forEach((child) => {
+        const fieldWrapper = child.querySelector(".field-wrapper");
+        items.push(
+          collectDataFromWrapper(fieldWrapper, fieldConfig.item_schema)
+        );
+      });
+      return items;
+    }
+    return null;
+  }
+
+  // --- Submission ---
+  function handleSubmit(e, actionType = "generate") {
+    e.preventDefault();
+
+    const formData = collectData(formContainer, SCHEMA_STRUCTURE);
+    console.log("Collected Data:", formData);
+
+    let btnText, loader, endpoint;
+
+    if (actionType === "generate") {
+      btnText = document.getElementById("btn-text");
+      loader = document.getElementById("loader");
+      btnText.textContent = "Generating...";
+      endpoint = "/generate";
+    } else if (actionType === "preview_code") {
+      btnText = document.getElementById("preview-btn-text");
+      loader = document.getElementById("preview-loader");
+      btnText.textContent = "Loading...";
+      endpoint = "/preview";
+    } else if (actionType === "preview_page") {
+      btnText = document.getElementById("preview-page-btn-text");
+      loader = document.getElementById("preview-page-loader");
+      btnText.textContent = "Loading...";
+      endpoint = "/preview-page";
     }
 
-    // --- Image Upload Handler ---
+    loader.classList.remove("hidden");
 
-    function handleImageUpload(file, inputHidden, previewContainer) {
-        const formData = new FormData();
-        formData.append('file', file);
+    fetch(endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        template_filename: TEMPLATE_FILENAME,
+        formData: formData,
+      }),
+    })
+      .then((res) => {
+        if (actionType === "preview_page") {
+          return res
+            .text()
+            .then((html) => ({ success: true, isHtml: true, html }));
+        }
+        return res.json();
+      })
+      .then((data) => {
+        if (actionType === "preview_page") {
+          // For page preview, open in new tab
+          const newWindow = window.open();
+          if (newWindow) {
+            newWindow.document.write(data.html);
+            newWindow.document.close();
+          } else {
+            alert("Please allow popups for this site to view the preview.");
+          }
+          btnText.textContent = "Preview Page";
+        } else if (data.success) {
+          if (actionType === "preview_code") {
+            const previewContent = document.getElementById("preview-content");
+            const previewSection = document.getElementById("preview-section");
 
-        // Show loading state
-        previewContainer.innerHTML = '<div class="text-xs text-blue-500">Uploading...</div>';
+            previewContent.textContent = data.content;
+            previewSection.classList.remove("hidden");
+            btnText.textContent = "Preview Code";
 
-        fetch('/upload', {
-            method: 'POST',
-            body: formData
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.url) {
-                    inputHidden.value = data.url; // Use Absolute path or relative as needed (server returned absolute)
-                    previewContainer.innerHTML = `<div class="text-xs text-green-600 mt-1">Uploaded: ${data.filename}</div>`;
-                    // Optional: Show thumbnail if it's an image
-                    if (file.type.startsWith('image/')) {
-                        const img = document.createElement('img');
-                        img.src = '/static/uploads/' + data.filename; // Simple preview path assuming flask static
-                        // But wait, the stored value is absolute path.
-                        // For preview we need web path.
-                        // Let's assume server logic for preview or just show name.
-                        // Actually, if we want a real preview, backend should return web path too.
-                        // For now just name is fine.
-                    }
-                } else {
-                    previewContainer.innerHTML = '<div class="text-xs text-red-500">Upload failed</div>';
-                }
-            })
-            .catch(err => {
-                console.error(err);
-                previewContainer.innerHTML = '<div class="text-xs text-red-500">Error uploading</div>';
-            });
+            previewSection.scrollIntoView({ behavior: "smooth" });
+          } else {
+            window.location.href = data.downloadUrl;
+            btnText.textContent = "Generate Astro File";
+          }
+        } else {
+          alert("Error: " + (data.error || "Unknown error"));
+          resetButtonText(actionType);
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        alert("Error processing request");
+        resetButtonText(actionType);
+      })
+      .finally(() => {
+        loader.classList.add("hidden");
+      });
+  }
+
+  function resetButtonText(actionType) {
+    if (actionType === "generate") {
+      document.getElementById("btn-text").textContent = "Generate Astro File";
+    } else if (actionType === "preview_code") {
+      document.getElementById("preview-btn-text").textContent = "Preview Code";
+    } else if (actionType === "preview_page") {
+      document.getElementById("preview-page-btn-text").textContent =
+        "Preview Page";
     }
+  }
 
-    // --- Recursive Form Renderer ---
+  document
+    .getElementById("generator-form")
+    .addEventListener("submit", (e) => handleSubmit(e, "generate"));
+  document
+    .getElementById("preview-btn")
+    .addEventListener("click", (e) => handleSubmit(e, "preview_code"));
+  document
+    .getElementById("preview-page-btn")
+    .addEventListener("click", (e) => handleSubmit(e, "preview_page"));
 
-    function renderField(fieldConfig, container, pathPrefix = '') {
-        const wrapper = document.createElement('div');
-        wrapper.className = "field-wrapper";
-        wrapper.dataset.key = fieldConfig.key;
-        wrapper.dataset.type = fieldConfig.type;
-
-        // Label
-        if (fieldConfig.label) {
-            wrapper.appendChild(createFieldLabel(fieldConfig.label));
-        }
-
-        // Field Types
-        if (fieldConfig.type === 'text') {
-            const input = createInput('text');
-            wrapper.appendChild(input);
-            wrapper.dataset.inputElement = "true"; // Marker to easy find
-        }
-        else if (fieldConfig.type === 'image' || fieldConfig.type === 'file') {
-            const fileInput = createInput('file');
-            const hiddenInput = document.createElement('input');
-            hiddenInput.type = "hidden";
-            const preview = document.createElement('div');
-
-            fileInput.addEventListener('change', (e) => {
-                if (e.target.files[0]) {
-                    handleImageUpload(e.target.files[0], hiddenInput, preview);
-                }
-            });
-
-            wrapper.appendChild(fileInput);
-            wrapper.appendChild(hiddenInput);
-            wrapper.appendChild(preview);
-            wrapper.dataset.inputElement = "true"; // Read from hiddenInput
-        }
-        else if (fieldConfig.type === 'checkbox') {
-            const input = document.createElement('input');
-            input.type = "checkbox";
-            input.className = "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded";
-            wrapper.appendChild(input);
-            wrapper.dataset.inputElement = "true";
-        }
-        else if (fieldConfig.type === 'object') {
-            const innerContainer = document.createElement('div');
-            innerContainer.className = "pl-4 border-l-2 border-gray-200 mt-2 space-y-4";
-            fieldConfig.fields.forEach(subField => {
-                renderField(subField, innerContainer);
-            });
-            wrapper.appendChild(innerContainer);
-        }
-        else if (fieldConfig.type === 'list') {
-            const listContainer = document.createElement('div');
-            listContainer.className = "space-y-4 mt-2";
-
-            const addItemBtn = document.createElement('button');
-            addItemBtn.type = "button";
-            addItemBtn.className = "text-sm text-blue-600 hover:text-blue-800 font-medium";
-            addItemBtn.textContent = "+ Add " + (fieldConfig.item_schema.label || "Item");
-
-            addItemBtn.onclick = () => {
-                const itemWrapper = document.createElement('div');
-                itemWrapper.className = "relative bg-gray-50 p-4 rounded border border-gray-200 list-item";
-
-                // Remove button
-                const removeBtn = document.createElement('button');
-                removeBtn.type = "button";
-                removeBtn.className = "absolute top-2 right-2 text-red-500 hover:text-red-700 font-bold";
-                removeBtn.innerHTML = "&times;";
-                removeBtn.onclick = () => itemWrapper.remove();
-
-                itemWrapper.appendChild(removeBtn);
-
-                // Render item content
-                renderField(fieldConfig.item_schema, itemWrapper);
-
-                // Special case: if item_schema is simple (text/image) directly inside, 
-                // renderField creates a wrapper with key/label.
-                // But for a list of strings, item_schema might look like {type: 'text', label: 'Item'}.
-                // This results in valid structure.
-
-                listContainer.appendChild(itemWrapper);
-            };
-
-            wrapper.appendChild(listContainer);
-            wrapper.appendChild(addItemBtn);
-        }
-
-        container.appendChild(wrapper);
-    }
-
-    // --- Main Rendering ---
-    const formContainer = document.getElementById('form-container');
-    SCHEMA_STRUCTURE.forEach(field => {
-        renderField(field, formContainer);
+  // Copy Button functionality
+  document.getElementById("copy-preview").addEventListener("click", () => {
+    const text = document.getElementById("preview-content").textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.getElementById("copy-preview");
+      const originalText = btn.textContent;
+      btn.textContent = "Copied!";
+      setTimeout(() => {
+        btn.textContent = originalText;
+      }, 2000);
     });
-
-    // --- Data Collection ---
-
-    function collectData(container, schema) {
-        if (!container) return null;
-
-        // If schema is array (root), loop it
-        if (Array.isArray(schema)) {
-            const data = {};
-            schema.forEach(field => {
-                // Find the wrapper for this key directly in this container
-                // We need to only look at direct children to avoid deep grabbing
-                // But our render structure is: container -> div.field-wrapper[data-key=...]
-                const wrapper = Array.from(container.children).find(child => child.dataset.key === field.key);
-                if (wrapper) {
-                    data[field.key] = collectDataFromWrapper(wrapper, field);
-                }
-            });
-            return data;
-        }
-        // If schema is single field definition (from list item or object)
-        return null;
-    }
-
-    function collectDataFromWrapper(wrapper, fieldConfig) {
-        if (fieldConfig.type === 'text') {
-            return wrapper.querySelector('input').value;
-        }
-        if (fieldConfig.type === 'checkbox') {
-            return wrapper.querySelector('input').checked;
-        }
-        if (fieldConfig.type === 'image' || fieldConfig.type === 'file') {
-            return wrapper.querySelector('input[type="hidden"]').value;
-        }
-        if (fieldConfig.type === 'object') {
-            const innerContainer = wrapper.querySelector('div.pl-4'); // The container we created
-            return collectData(innerContainer, fieldConfig.fields);
-        }
-        if (fieldConfig.type === 'list') {
-            const listContainer = wrapper.children[fieldConfig.label ? 1 : 0]; // 0 is label, 1 is container usually. 
-            // Better selector:
-            const container = wrapper.querySelector('div.space-y-4'); // The list container
-            const items = [];
-            Array.from(container.children).forEach(child => {
-                // Each child is a list-item wrapper
-                // Inside list-item wrapper, we called renderField(fieldConfig.item_schema, itemWrapper)
-                // So there is a field-wrapper inside.
-                const fieldWrapper = child.querySelector('.field-wrapper');
-                // Wait, renderField creates a wrapper. 
-                // If item_schema is simple types like text, it has a key (maybe undefined if not passed?).
-                // Let's look at schema config:
-                // item_schema: {type: "text", label: "Line"} -> key is undefined.
-
-                // If key is undefined, renderField creates wrapper with dataset.key="undefined".
-                // That's fine.
-
-                items.push(collectDataFromWrapper(fieldWrapper, fieldConfig.item_schema));
-            });
-            return items;
-        }
-        return null;
-    }
-
-    // --- Submission ---
-
-    document.getElementById('generator-form').addEventListener('submit', (e) => {
-        e.preventDefault();
-
-        // Collect data
-        const formData = collectData(formContainer, SCHEMA_STRUCTURE);
-        console.log("Collected Data:", formData);
-
-        const btnText = document.getElementById('btn-text');
-        const loader = document.getElementById('loader');
-
-        btnText.textContent = "Generating...";
-        loader.classList.remove('hidden');
-
-        fetch('/generate', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                template_filename: TEMPLATE_FILENAME,
-                formData: formData
-            })
-        })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    window.location.href = data.downloadUrl;
-                    btnText.textContent = "Generate Astro File";
-                } else {
-                    alert("Error: " + data.error);
-                    btnText.textContent = "Generate Astro File";
-                }
-            })
-            .catch(err => {
-                alert("Error: " + err);
-                btnText.textContent = "Generate Astro File";
-            })
-            .finally(() => {
-                loader.classList.add('hidden');
-            });
-    });
-
+  });
 </script>
 {% endblock %}

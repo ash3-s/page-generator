@@ -138,6 +138,130 @@ def generate():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/preview', methods=['POST'])
+def preview():
+    data = request.json
+    filename = data.get('template_filename')
+    form_data = data.get('formData')
+    
+    # Helper to clean up paths if they are absolute local paths (e.g. from cached frontend state)
+    def clean_paths(obj, key=None):
+        if isinstance(obj, dict):
+            return {k: clean_paths(v, k) for k, v in obj.items()}
+        elif isinstance(obj, list):
+            return [clean_paths(v, key) for v in obj]
+        elif isinstance(obj, str):
+            # Check for upload paths or existing asset paths that might need correction
+            if '/static/uploads/' in obj or (os.path.isabs(obj) and 'uploads' in obj) or 'assets/' in obj:
+                base = os.path.basename(obj)
+                
+                # Special handling for specific templates
+                if filename == 'wall-mounted-receptacles.astro.j2':
+                    if base.lower().endswith('.pdf'):
+                        return f"../../../../assets/Mennekes/[category]/{base}"
+                    else:
+                        return f"../../../../assets/Mennekes Pictures/{base}"
+                
+                # Special handling for caution spotlight v2 (assumed 1 level shallower)
+                if filename == 'caution-spotlight-fittings-v2.astro.j2':
+                    return f"../../../assets/{base}"
+                
+                # Special handling for air rod to tape coupling
+                if filename == 'air_rod_to_tape-cable_coupling.astro.j2':
+                    if key and 'speedwell' in key:
+                         return f"../../../assets/Lightning/files/{base}"
+                    return f"../../../assets/Lightning/{base}"
+                
+                return f"../../../../assets/{base}"
+            return obj
+        return obj
+
+    # Helper to unflatten dot-notation keys
+    def unflatten(dictionary):
+        result = {}
+        for key, value in dictionary.items():
+            parts = key.split('.')
+            d = result
+            for part in parts[:-1]:
+                if part not in d:
+                    d[part] = {}
+                d = d[part]
+            d[parts[-1]] = value
+        return result
+
+    if not filename or not form_data:
+        return jsonify({'error': 'Missing data'}), 400
+        
+    try:
+        if form_data:
+            form_data = clean_paths(form_data)
+            form_data = unflatten(form_data)
+
+        template = astro_env.get_template(filename)
+        rendered_content = template.render(**form_data)
+        
+        return jsonify({'success': True, 'content': rendered_content})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/preview-page', methods=['POST'])
+def preview_page():
+    data = request.json
+    filename = data.get('template_filename')
+    form_data = data.get('formData')
+    
+    # Helper to clean up paths for visual preview
+    # We receive paths like "../../../../assets/my_image.png" from the frontend (what matches the code generation)
+    # But for visual preview in Flask, we need "/static/uploads/my_image.png"
+    def fix_paths_for_preview(obj):
+        if isinstance(obj, dict):
+            return {k: fix_paths_for_preview(v) for k, v in obj.items()}
+        elif isinstance(obj, list):
+            return [fix_paths_for_preview(v) for v in obj]
+        elif isinstance(obj, str):
+            # Check for asset paths that need correction for web view
+            # The uploaded files are saved in static/uploads
+            # processing standard image fields
+            if 'assets/' in obj:
+                base = os.path.basename(obj)
+                # Assume it is in uploads if it was uploaded
+                # If there are other static assets not in uploads, this might break, 
+                # but for this tool, user uploads are the main dynamic thing.
+                return f"/static/uploads/{base}"
+            return obj
+        return obj
+    
+    # Helper to unflatten dot-notation keys
+    def unflatten(dictionary):
+        result = {}
+        for key, value in dictionary.items():
+            parts = key.split('.')
+            d = result
+            for part in parts[:-1]:
+                if part not in d:
+                    d[part] = {}
+                d = d[part]
+            d[parts[-1]] = value
+        return result
+
+    if not filename or not form_data:
+        return jsonify({'error': 'Missing data'}), 400
+        
+    try:
+        if form_data:
+            form_data = fix_paths_for_preview(form_data)
+            form_data = unflatten(form_data)
+        
+        # Determine the preview template file
+        preview_template_name = filename.replace('.astro.j2', '.html')
+
+        preview_path = f"previews/{preview_template_name}"
+        
+        return render_template(preview_path, **form_data)
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/download/<filename>')
 def download(filename):
     return send_file(os.path.join(app.config['OUTPUT_FOLDER'], filename), as_attachment=True)

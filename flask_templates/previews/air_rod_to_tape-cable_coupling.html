@@ -1,0 +1,42 @@
+{% extends "preview_layout.html" %} {% from 'preview_macros.html' import
+HeaderText, ProductShowcase, ProductShowcaseDescription %} {% block content %}
+<div class="bg-white min-h-screen pb-12">
+  {{ HeaderText(title, "") }}
+
+  <!-- Raychem Section -->
+  <div class="mb-10">
+    {{ ProductShowcase( images=raychem.images, title=title ~ " - Raychem",
+    technicalData=raychem.tech_details, description="" ) }}
+
+    <section
+      class="lg:px-4 lg:mx-25 lg:px-10 flex flex-col gap-2 mt-10 overflow-x-scroll"
+    >
+      {% for img in raychem.spec %}
+      <img
+        src="{{ img }}"
+        alt="Raychem Specification"
+        class="min-w-150 lg:max-w-200"
+      />
+      {% endfor %}
+    </section>
+  </div>
+
+  <!-- Speedwell Section -->
+  <div class="mb-10">
+    {{ ProductShowcaseDescription( images=speedwell.images, title=title ~ " -
+    Speedwell", description=speedwell.description ) }}
+
+    <section
+      class="lg:px-4 lg:mx-25 lg:px-10 flex flex-col gap-2 mt-10 overflow-x-scroll"
+    >
+      {% for img in speedwell.spec %}
+      <img
+        src="{{ img }}"
+        alt="Speedwell Specification"
+        class="min-w-150 lg:max-w-200"
+      />
+      {% endfor %}
+    </section>
+  </div>
+</div>
+{% endblock %}

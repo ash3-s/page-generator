@@ -1,7 +1,7 @@
 
 TEMPLATE_CONFIG = {
     "air_rod_to_tape-cable_coupling.astro.j2": {
-        "name": "Air Rod to Tape Cable Coupling",
+        "name": "Lightning products comparison page (images and text, raychem- description images, speedwell-text description)",
         "structure": [
             {"key": "title", "label": "Title", "type": "text"},
             {"key": "raychem.tech_details", "label": "Raychem Tech Details Image", "type": "image"},
@@ -38,7 +38,7 @@ TEMPLATE_CONFIG = {
         ]
     },
     "aluminium-cleats.astro.j2": {
-        "name": "Aluminium Cleats",
+        "name": "Product card grid page (to show subcategories of products)",
         "structure": [
             {"key": "page_heading", "label": "Page Heading", "type": "text"},
             {
@@ -58,7 +58,7 @@ TEMPLATE_CONFIG = {
         ]
     },
     "bw-industrial-cable-gland.astro.j2": {
-        "name": "BW Industrial Cable Gland",
+        "name": "Comparison of two products (images only)",
         "structure": [
             {"key": "title", "label": "Product Title", "type": "text"},
             {
@@ -100,7 +100,7 @@ TEMPLATE_CONFIG = {
         ]
     },
     "cable-ties-coated.astro.j2": {
-        "name": "Cable Ties Coated",
+        "name": "Induvidual product page (images only)",
         "structure": [
             {"key": "title", "label": "Title", "type": "text"},
             {"key": "description", "label": "Description", "type": "text"},
@@ -120,7 +120,7 @@ TEMPLATE_CONFIG = {
         ]
     },
     "caution-spotlight-fittings-v2.astro.j2": {
-        "name": "Caution Spotlight Fittings V2",
+        "name": "Warom products comparison page (side-by-side view with tables)",
         "structure": [
             {"key": "title", "label": "Title", "type": "text"},
             {"key": "description", "label": "Description", "type": "text"},
@@ -154,7 +154,7 @@ TEMPLATE_CONFIG = {
         ]
     },
     "wall-mounted-receptacles.astro.j2": {
-        "name": "Wall Mounted Receptacles",
+        "name": "Comparison of two products with detailed part numbers and corresponding tables",
         "structure": [
             {"key": "page_heading", "label": "Page Heading", "type": "text"},
             {

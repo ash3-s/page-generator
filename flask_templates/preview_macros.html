@@ -1,0 +1,325 @@
+{% macro HeaderText(pageHeading, pageCaption) %}
+<div
+  class="flex flex-col gap-2 lg:px-10 p-3 sm:flex-row sm:justify-between mb-4 items-center"
+>
+  <h3
+    class="text-lg text-center font-semibold sm:text-left sm:text-2xl md:text-3xl lg:text-4xl"
+  >
+    {{ pageHeading }}
+  </h3>
+  <p class="hidden sm:block font-medium">{{ pageCaption }}</p>
+</div>
+{% endmacro %} {% macro ProductShowcase(images, title, technicalData,
+description) %}
+<div
+  class="w-full max-w-7xl mx-auto px-4 lg:px-10 py-6 grid grid-cols-1 lg:grid-cols-2 gap-8"
+>
+  <!-- Left - Images -->
+  <div>
+    <div
+      class="w-full bg-gray-100 overflow-hidden flex items-center justify-center h-48 md:h-64"
+    >
+      <img src="{{ images[0] }}" class="object-contain p-4 w-full h-full" />
+    </div>
+    <!-- Thumbnails -->
+    <div class="flex flex-wrap gap-3 mt-4">
+      {% for img in images %}
+      <button
+        class="w-20 h-20 border-2 overflow-hidden transition {% if loop.first %}border-blue-600{% else %}border-gray-300{% endif %}"
+      >
+        <img src="{{ img }}" class="object-contain p-2 w-full h-full" />
+      </button>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Right - Text -->
+  <div class="flex flex-col gap-4">
+    {% if description %}
+    <p class="text-gray-700 leading-relaxed text-sm md:text-base">
+      {{ description }}
+    </p>
+    {% endif %} {% if technicalData %}
+    <img
+      src="{{ technicalData }}"
+      alt="Technical Data"
+      class="w-full h-64 object-contain"
+    />
+    {% endif %}
+
+    <div class="flex gap-3 pt-2">
+      <button
+        class="flex items-center gap-2 px-6 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors cursor-pointer text-gray-800"
+      >
+        + Add to List
+      </button>
+      <button
+        class="flex items-center gap-2 px-6 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors cursor-pointer text-gray-800"
+      >
+        Enquire now
+      </button>
+      <button
+        class="flex items-center gap-2 px-6 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors cursor-pointer text-gray-800"
+      >
+        Download Brochure
+      </button>
+    </div>
+  </div>
+</div>
+{% endmacro %} {% macro ProductShowcaseDescription(images, title, description)
+%}
+<div
+  class="w-full max-w-7xl mx-auto px-4 lg:px-10 py-6 grid grid-cols-1 lg:grid-cols-2 gap-8"
+>
+  <div>
+    <div
+      class="w-full bg-gray-100 overflow-hidden flex items-center justify-center h-48 md:h-64"
+    >
+      <img src="{{ images[0] }}" class="object-contain p-4 w-full h-full" />
+    </div>
+    <div class="flex flex-wrap gap-3 mt-4">
+      {% for img in images %}
+      <button
+        class="w-20 h-20 border-2 overflow-hidden transition border-gray-300"
+      >
+        <img src="{{ img }}" class="object-contain p-2 w-full h-full" />
+      </button>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="flex flex-col gap-4">
+    <div class="flex flex-col gap-4">
+      {% for paragraph in description %}
+      <p class="text-gray-700 leading-relaxed text-sm md:text-base">
+        {{ paragraph }}
+      </p>
+      {% endfor %}
+    </div>
+    <div class="flex gap-3 pt-2">
+      <button
+        class="flex items-center gap-2 px-6 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors cursor-pointer text-gray-800"
+      >
+        + Add to List
+      </button>
+      <button
+        class="flex items-center gap-2 px-6 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors cursor-pointer text-gray-800"
+      >
+        Enquire now
+      </button>
+      <button
+        class="flex items-center gap-2 px-6 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors cursor-pointer text-gray-800"
+      >
+        Download Brochure
+      </button>
+    </div>
+  </div>
+</div>
+{% endmacro %} {% macro ProductVariantsTable(variants) %}
+<div class="overflow-x-auto w-full my-8 px-4 lg:px-10">
+  <table
+    class="min-w-full bg-white border border-gray-200 rounded-lg shadow-sm"
+  >
+    <thead>
+      <tr class="bg-blue-600 text-white uppercase text-sm leading-normal">
+        <th
+          rowspan="2"
+          class="py-3 px-6 text-left border-r border-gray-200 font-semibold"
+        >
+          Protection type
+        </th>
+        <th
+          rowspan="2"
+          class="py-3 px-6 text-left border-r border-gray-200 font-semibold"
+        >
+          Rating Amp.
+        </th>
+        <th
+          rowspan="2"
+          class="py-3 px-6 text-left border-r border-gray-200 font-semibold"
+        >
+          No. of poles
+        </th>
+        <th
+          class="py-3 px-6 text-center border-r border-gray-200 border-b font-semibold"
+        >
+          230 V 50 and 60 Hz
+        </th>
+        <th
+          class="py-3 px-6 text-center border-r border-b border-gray-200 font-semibold"
+        >
+          400 V 50 and 60 Hz
+        </th>
+        <th rowspan="2" class="py-3 px-6 text-center font-semibold">
+          Product Data Sheet
+        </th>
+      </tr>
+      <tr class="bg-blue-600 text-white uppercase text-sm leading-normal">
+        <th
+          class="py-3 px-6 text-center border-r border-gray-200 font-semibold"
+        >
+          Part no.
+        </th>
+        <th
+          class="py-3 px-6 text-center border-r border-gray-200 font-semibold"
+        >
+          Part no.
+        </th>
+      </tr>
+    </thead>
+    <tbody class="text-gray-900 text-sm">
+      {% for variant in variants %}
+      <tr class="border-b border-gray-200 hover:bg-gray-50 transition-colors">
+        <td
+          class="py-3 px-6 text-left whitespace-nowrap border-r border-gray-200 font-medium"
+        >
+          {{ variant.protectionType }}
+        </td>
+        <td class="py-3 px-6 text-left border-r border-gray-200">
+          {{ variant.ratingAmp }}
+        </td>
+        <td class="py-3 px-6 text-left border-r border-gray-200">
+          {{ variant.poles }}
+        </td>
+        <td class="py-3 px-6 text-center border-r border-gray-200">
+          {{ variant.partNo230V or "-" }}
+        </td>
+        <td class="py-3 px-6 text-center border-r border-gray-200">
+          {{ variant.partNo400V or "-" }}
+        </td>
+        <td class="py-3 px-6 text-center">
+          <button
+            class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-xs font-bold uppercase cursor-pointer"
+          >
+            View
+          </button>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endmacro %} {% macro ProductCardGrid(products) %}
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-4 lg:px-10">
+  {% for productInfo in products %}
+  <div class="w-full h-72 shrink-0 shadow-lg bg-white">
+    <a href="{{ productInfo.target_page }}">
+      <div
+        class="relative w-full h-full text-white overflow-hidden group cursor-pointer"
+      >
+        <img
+          src="{{ productInfo.image_url }}"
+          alt="{{ productInfo.name }}"
+          class="w-full h-full object-contain p-4 transition duration-300 ease-in-out"
+        />
+        <div
+          class="absolute inset-0 bg-blue-600/90 opacity-0 transform translate-y-full hover:opacity-100 hover:translate-y-0 transition-all duration-300 ease-in-out"
+        ></div>
+        <div
+          class="absolute inset-0 bottom-0 px-4 pt-20 opacity-0 transform translate-y-full hover:opacity-100 hover:translate-y-1/6 transition-all duration-300 ease-in-out"
+        >
+          <h3 class="text-md sm:text-lg font-semibold text-white">
+            {{ productInfo.name }}
+          </h3>
+          <p class="text-xs sm:text-sm text-white">
+            {{ productInfo.description }}
+          </p>
+        </div>
+      </div>
+    </a>
+  </div>
+  {% endfor %}
+</div>
+{% endmacro %} {% macro ProductShowcaseCompareVertical(products) %}
+<div class="w-full max-w-7xl mx-auto px-4 lg:px-10 py-16">
+  <div class="flex flex-col">
+    {% for product in products %}
+    <div
+      class="w-full {% if not loop.last %}border-b-2 border-gray-200 pb-8 mb-8{% endif %}"
+    >
+      <div class="flex flex-col lg:flex-row gap-8 lg:gap-12">
+        <!-- Left Side: Images -->
+        <div class="w-full lg:w-1/2">
+          <div
+            class="w-full bg-gray-50 rounded-xl overflow-hidden flex items-center justify-center h-48 mb-4 border border-gray-100"
+          >
+            <img
+              src="{{ product.images[0] }}"
+              alt="{{ product.title }}"
+              class="object-contain p-4 w-full h-full"
+            />
+          </div>
+          <div class="flex flex-wrap gap-2 justify-center">
+            {% for img in product.images %}
+            <button
+              class="w-20 h-20 border-2 rounded-lg overflow-hidden transition border-gray-200"
+            >
+              <img src="{{ img }}" class="object-contain p-1 w-full h-full" />
+            </button>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Right Side: Info & Actions -->
+        <div class="w-full lg:w-1/2 flex flex-col">
+          <h2 class="text-2xl lg:text-3xl font-bold mb-3 text-gray-900">
+            {{ product.title }}
+          </h2>
+          {% if product.description %}
+          <p class="text-gray-600 mb-4 text-base">{{ product.description }}</p>
+          {% endif %}
+
+          <div class="flex flex-wrap gap-3 mb-6">
+            <button
+              class="flex items-center gap-2 px-6 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors cursor-pointer text-gray-800 font-medium"
+            >
+              + Add to List
+            </button>
+            <button
+              class="flex items-center gap-2 px-6 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors cursor-pointer text-gray-800 font-medium"
+            >
+              Enquire Now
+            </button>
+            <button
+              class="flex items-center gap-2 px-6 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors cursor-pointer text-gray-800 font-medium"
+            >
+              Download Brochure
+            </button>
+          </div>
+
+          <div class="mt-auto">
+            <h3 class="text-lg font-bold mb-2 text-gray-800">
+              Technical Details
+            </h3>
+            <div class="space-y-4">
+              {% for img in product.technicalDataImages %}
+              <img
+                src="{{ img }}"
+                class="w-full h-auto object-contain border border-gray-200 rounded-lg bg-white shadow-sm"
+              />
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {% if product.specImages %}
+      <div class="mt-12 w-full">
+        <h3 class="text-xl font-bold mb-6 text-gray-800">
+          Detailed Specifications
+        </h3>
+        <div class="flex gap-4 overflow-x-auto pb-4">
+          {% for img in product.specImages %}
+          <img
+            src="{{ img }}"
+            class="min-w-[600px] h-auto object-contain border border-gray-200 rounded-lg bg-white shadow-sm"
+          />
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endmacro %}

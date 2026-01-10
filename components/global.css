@@ -1,0 +1,63 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
+@import "tailwindcss";
+
+@theme {
+  --color-brand-color: #171a5b;
+  --color-hero-caption: #444444;
+  --font-inter: "Inter", sans-serif;
+  --color-service-carousel: #f9f9f9;
+  --color-input-field: #d9d9d9;
+  --color-accent: #4444ff;
+}
+* {
+  font-family: var(--font-inter), sans-serif;
+}
+
+html {
+  color: #111111;
+  scroll-behavior: smooth;
+}
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 160s linear infinite;
+}
+.group:hover .animate-marquee {
+  animation-play-state: paused;
+}
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loader {
+  width: 50px;
+  --b: 8px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #514b82;
+  mask: repeating-conic-gradient(#0000 0deg, #000 1deg 70deg, #0000 71deg 90deg),
+    radial-gradient(
+      farthest-side,
+      #0000 calc(100% - var(--b) - 1px),
+      #000 calc(100% - var(--b))
+    );
+  mask-composite: intersect;
+  animation: l5 2s infinite linear;
+}
+@keyframes l5 {
+  to {
+    transform: rotate(1turn);
+  }
+}
