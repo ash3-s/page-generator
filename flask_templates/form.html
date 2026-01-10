@@ -1,0 +1,286 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-md">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold">{{ config.name }}</h1>
+        <a href="/" class="text-blue-600 hover:text-blue-800">Back to List</a>
+    </div>
+
+    <form id="generator-form">
+        <div id="form-container" class="space-y-6"></div>
+
+        <div class="mt-8 flex justify-end">
+            <button type="submit"
+                class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center">
+                <span id="btn-text">Generate Astro File</span>
+                <div id="loader" class="loader ml-3 hidden"></div>
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Config Data -->
+<script>
+    const SCHEMA_STRUCTURE = {{ config.structure | tojson }};
+    const TEMPLATE_FILENAME = "{{ filename }}";
+</script>
+
+<script>
+    // --- UI/DOM Helpers ---
+
+    function createFieldLabel(text) {
+        const label = document.createElement('label');
+        label.className = "block text-sm font-medium text-gray-700 mb-1";
+        label.textContent = text;
+        return label;
+    }
+
+    function createInput(type = 'text') {
+        const input = document.createElement('input');
+        input.type = type;
+        input.className = "w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 border p-2";
+        return input;
+    }
+
+    // --- Image Upload Handler ---
+
+    function handleImageUpload(file, inputHidden, previewContainer) {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        // Show loading state
+        previewContainer.innerHTML = '<div class="text-xs text-blue-500">Uploading...</div>';
+
+        fetch('/upload', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.url) {
+                    inputHidden.value = data.url; // Use Absolute path or relative as needed (server returned absolute)
+                    previewContainer.innerHTML = `<div class="text-xs text-green-600 mt-1">Uploaded: ${data.filename}</div>`;
+                    // Optional: Show thumbnail if it's an image
+                    if (file.type.startsWith('image/')) {
+                        const img = document.createElement('img');
+                        img.src = '/static/uploads/' + data.filename; // Simple preview path assuming flask static
+                        // But wait, the stored value is absolute path.
+                        // For preview we need web path.
+                        // Let's assume server logic for preview or just show name.
+                        // Actually, if we want a real preview, backend should return web path too.
+                        // For now just name is fine.
+                    }
+                } else {
+                    previewContainer.innerHTML = '<div class="text-xs text-red-500">Upload failed</div>';
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                previewContainer.innerHTML = '<div class="text-xs text-red-500">Error uploading</div>';
+            });
+    }
+
+    // --- Recursive Form Renderer ---
+
+    function renderField(fieldConfig, container, pathPrefix = '') {
+        const wrapper = document.createElement('div');
+        wrapper.className = "field-wrapper";
+        wrapper.dataset.key = fieldConfig.key;
+        wrapper.dataset.type = fieldConfig.type;
+
+        // Label
+        if (fieldConfig.label) {
+            wrapper.appendChild(createFieldLabel(fieldConfig.label));
+        }
+
+        // Field Types
+        if (fieldConfig.type === 'text') {
+            const input = createInput('text');
+            wrapper.appendChild(input);
+            wrapper.dataset.inputElement = "true"; // Marker to easy find
+        }
+        else if (fieldConfig.type === 'image' || fieldConfig.type === 'file') {
+            const fileInput = createInput('file');
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = "hidden";
+            const preview = document.createElement('div');
+
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files[0]) {
+                    handleImageUpload(e.target.files[0], hiddenInput, preview);
+                }
+            });
+
+            wrapper.appendChild(fileInput);
+            wrapper.appendChild(hiddenInput);
+            wrapper.appendChild(preview);
+            wrapper.dataset.inputElement = "true"; // Read from hiddenInput
+        }
+        else if (fieldConfig.type === 'checkbox') {
+            const input = document.createElement('input');
+            input.type = "checkbox";
+            input.className = "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded";
+            wrapper.appendChild(input);
+            wrapper.dataset.inputElement = "true";
+        }
+        else if (fieldConfig.type === 'object') {
+            const innerContainer = document.createElement('div');
+            innerContainer.className = "pl-4 border-l-2 border-gray-200 mt-2 space-y-4";
+            fieldConfig.fields.forEach(subField => {
+                renderField(subField, innerContainer);
+            });
+            wrapper.appendChild(innerContainer);
+        }
+        else if (fieldConfig.type === 'list') {
+            const listContainer = document.createElement('div');
+            listContainer.className = "space-y-4 mt-2";
+
+            const addItemBtn = document.createElement('button');
+            addItemBtn.type = "button";
+            addItemBtn.className = "text-sm text-blue-600 hover:text-blue-800 font-medium";
+            addItemBtn.textContent = "+ Add " + (fieldConfig.item_schema.label || "Item");
+
+            addItemBtn.onclick = () => {
+                const itemWrapper = document.createElement('div');
+                itemWrapper.className = "relative bg-gray-50 p-4 rounded border border-gray-200 list-item";
+
+                // Remove button
+                const removeBtn = document.createElement('button');
+                removeBtn.type = "button";
+                removeBtn.className = "absolute top-2 right-2 text-red-500 hover:text-red-700 font-bold";
+                removeBtn.innerHTML = "&times;";
+                removeBtn.onclick = () => itemWrapper.remove();
+
+                itemWrapper.appendChild(removeBtn);
+
+                // Render item content
+                renderField(fieldConfig.item_schema, itemWrapper);
+
+                // Special case: if item_schema is simple (text/image) directly inside, 
+                // renderField creates a wrapper with key/label.
+                // But for a list of strings, item_schema might look like {type: 'text', label: 'Item'}.
+                // This results in valid structure.
+
+                listContainer.appendChild(itemWrapper);
+            };
+
+            wrapper.appendChild(listContainer);
+            wrapper.appendChild(addItemBtn);
+        }
+
+        container.appendChild(wrapper);
+    }
+
+    // --- Main Rendering ---
+    const formContainer = document.getElementById('form-container');
+    SCHEMA_STRUCTURE.forEach(field => {
+        renderField(field, formContainer);
+    });
+
+    // --- Data Collection ---
+
+    function collectData(container, schema) {
+        if (!container) return null;
+
+        // If schema is array (root), loop it
+        if (Array.isArray(schema)) {
+            const data = {};
+            schema.forEach(field => {
+                // Find the wrapper for this key directly in this container
+                // We need to only look at direct children to avoid deep grabbing
+                // But our render structure is: container -> div.field-wrapper[data-key=...]
+                const wrapper = Array.from(container.children).find(child => child.dataset.key === field.key);
+                if (wrapper) {
+                    data[field.key] = collectDataFromWrapper(wrapper, field);
+                }
+            });
+            return data;
+        }
+        // If schema is single field definition (from list item or object)
+        return null;
+    }
+
+    function collectDataFromWrapper(wrapper, fieldConfig) {
+        if (fieldConfig.type === 'text') {
+            return wrapper.querySelector('input').value;
+        }
+        if (fieldConfig.type === 'checkbox') {
+            return wrapper.querySelector('input').checked;
+        }
+        if (fieldConfig.type === 'image' || fieldConfig.type === 'file') {
+            return wrapper.querySelector('input[type="hidden"]').value;
+        }
+        if (fieldConfig.type === 'object') {
+            const innerContainer = wrapper.querySelector('div.pl-4'); // The container we created
+            return collectData(innerContainer, fieldConfig.fields);
+        }
+        if (fieldConfig.type === 'list') {
+            const listContainer = wrapper.children[fieldConfig.label ? 1 : 0]; // 0 is label, 1 is container usually. 
+            // Better selector:
+            const container = wrapper.querySelector('div.space-y-4'); // The list container
+            const items = [];
+            Array.from(container.children).forEach(child => {
+                // Each child is a list-item wrapper
+                // Inside list-item wrapper, we called renderField(fieldConfig.item_schema, itemWrapper)
+                // So there is a field-wrapper inside.
+                const fieldWrapper = child.querySelector('.field-wrapper');
+                // Wait, renderField creates a wrapper. 
+                // If item_schema is simple types like text, it has a key (maybe undefined if not passed?).
+                // Let's look at schema config:
+                // item_schema: {type: "text", label: "Line"} -> key is undefined.
+
+                // If key is undefined, renderField creates wrapper with dataset.key="undefined".
+                // That's fine.
+
+                items.push(collectDataFromWrapper(fieldWrapper, fieldConfig.item_schema));
+            });
+            return items;
+        }
+        return null;
+    }
+
+    // --- Submission ---
+
+    document.getElementById('generator-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        // Collect data
+        const formData = collectData(formContainer, SCHEMA_STRUCTURE);
+        console.log("Collected Data:", formData);
+
+        const btnText = document.getElementById('btn-text');
+        const loader = document.getElementById('loader');
+
+        btnText.textContent = "Generating...";
+        loader.classList.remove('hidden');
+
+        fetch('/generate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                template_filename: TEMPLATE_FILENAME,
+                formData: formData
+            })
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = data.downloadUrl;
+                    btnText.textContent = "Generate Astro File";
+                } else {
+                    alert("Error: " + data.error);
+                    btnText.textContent = "Generate Astro File";
+                }
+            })
+            .catch(err => {
+                alert("Error: " + err);
+                btnText.textContent = "Generate Astro File";
+            })
+            .finally(() => {
+                loader.classList.add('hidden');
+            });
+    });
+
+</script>
+{% endblock %}

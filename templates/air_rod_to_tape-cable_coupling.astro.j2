@@ -1,0 +1,75 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import HeaderText from "../../../components/HeaderText";
+
+import ProductShowcase from "../../../components/ProductShowcase";
+import { ProductShowcaseDescription } from "../../../components/ProductShowcase";
+
+{% for img in raychem.images %}
+import raychem_img_{{ loop.index }} from "{{ img }}";
+{% endfor %}
+{% for img in raychem.spec %}
+import raychem_spec_{{ loop.index }} from "{{ img }}";
+{% endfor %}
+{% if raychem.tech_details %}
+import raychem_tech_data from "{{ raychem.tech_details }}";
+{% endif %}
+
+{% for img in speedwell.images %}
+import speedwell_img_{{ loop.index }} from "{{ img }}";
+{% endfor %}
+{% for img in speedwell.spec %}
+import speedwell_spec_{{ loop.index }} from "{{ img }}";
+{% endfor %}
+
+const raychemProduct = {
+  images: [
+    {% for img in raychem.images %}
+    raychem_img_{{ loop.index }}.src,
+    {% endfor %}
+  ],
+  title: "{{ title }} - Raychem",
+  technicalData: raychem_tech_data.src,
+  description: "" 
+};
+
+const speedwellProduct = {
+  images: [
+    {% for img in speedwell.images %}
+    speedwell_img_{{ loop.index }}.src,
+    {% endfor %}
+  ],
+  title: "{{ title }} - Speedwell",
+  description: [
+    {% for desc in speedwell.description %}
+    `{{ desc }}`,
+    {% endfor %}
+  ]
+};
+
+---
+
+<Layout>
+  <HeaderText pageHeading="{{ title }}" pageCaption="" />
+  
+  <div class="mb-10">
+      <ProductShowcase images={raychemProduct.images} title={raychemProduct.title} technicalData={raychemProduct.technicalData} description={raychemProduct.description} client:load />
+
+      <section class="lg:px-4 lg:mx-25 lg:px-10 flex flex-col gap-2 mt-10 overflow-x-scroll">
+        {% for img in raychem.spec %}
+        <img src={raychem_spec_{{ loop.index }}.src} alt="Raychem Specification" class="min-w-150 lg:max-w-200" />
+        {% endfor %}
+      </section>
+  </div>
+  
+  <div class="mb-10">
+      <ProductShowcaseDescription images={speedwellProduct.images} title={speedwellProduct.title} description={speedwellProduct.description} client:load />
+
+      <section class="lg:px-4 lg:mx-25 lg:px-10 flex flex-col gap-2 mt-10 overflow-x-scroll">
+        {% for img in speedwell.spec %}
+        <img src={speedwell_spec_{{ loop.index }}.src} alt="Speedwell Specification" class="min-w-150 lg:max-w-200" />
+        {% endfor %}
+      </section>
+  </div>
+
+</Layout>

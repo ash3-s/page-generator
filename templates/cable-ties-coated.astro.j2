@@ -1,0 +1,37 @@
+---
+import Layout from "../../../../layouts/Layout.astro";
+import HeaderText from "../../../../components/HeaderText";
+import ProductShowcase from "../../../../components/ProductShowcase";
+{% for img in images %}
+import product_img_{{ loop.index }} from "{{ img }}";
+{% endfor %}
+import technicalData from "{{ tech_data_image }}";
+{% for table_img in table_images %}
+import table_img_{{ loop.index }} from "{{ table_img }}";
+{% endfor %}
+
+const product = {
+  images: [
+    {% for img in images %}
+    product_img_{{ loop.index }}.src,
+    {% endfor %}
+  ],
+  title: "{{ title }}",
+  technicalData: technicalData.src,
+  description:
+    "{{ description }}"
+};
+
+---
+
+<Layout>
+  <HeaderText pageHeading="{{ title }}" pageCaption="" />
+
+  <ProductShowcase images={product.images} title={product.title} technicalData={product.technicalData} description={product.description} client:load />
+
+  <section class="lg:px-4 lg:mx-25 lg:px-10 flex flex-col gap-2 mt-30 overflow-x-scroll">
+    {% for table_img in table_images %}
+    <img src={table_img_{{ loop.index }}.src} alt="{{ title }} Table" class="min-w-150 lg:max-w-200" />
+    {% endfor %}
+  </section>
+</Layout>

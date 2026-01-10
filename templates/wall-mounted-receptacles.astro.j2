@@ -1,0 +1,77 @@
+---
+import Layout from "../../../../layouts/Layout.astro";
+import HeaderText from "../../../../components/HeaderText";
+import ProductShowcaseDescription from "../../../../components/ProductShowcaseDescription";
+import ProductVariantsTable from "../../../../components/ProductVariantsTable";
+
+{% for product_group in product_groups %}
+{% set outer_index = loop.index %}
+{# Images for Product Group {{ loop.index }} #}
+{% for img in product_group.images %}
+import group_{{ outer_index }}_img_{{ loop.index }} from "{{ img }}";
+{% endfor %}
+
+{# PDFs for Product Group {{ loop.index }} #}
+{% for variant in product_group.variants %}
+{% if variant.pdf_link %}
+import group_{{ outer_index }}_pdf_{{ loop.index }} from "{{ variant.pdf_link }}";
+{% endif %}
+{% endfor %}
+{% endfor %}
+
+
+{% for product_group in product_groups %}
+{% set outer_index = loop.index %}
+const product{{ loop.index }} = {
+  images: [
+    {% for img in product_group.images %}
+    group_{{ outer_index }}_img_{{ loop.index }}.src,
+    {% endfor %}
+  ],
+  title: "{{ product_group.title }}",
+  description: [
+    {% for desc_line in product_group.description %}
+    "{{ desc_line }}",
+    {% endfor %}
+  ]
+};
+
+const variants{{ loop.index }} = [
+  {% for variant in product_group.variants %}
+  {
+    protectionType: "{{ variant.protectionType }}",
+    ratingAmp: "{{ variant.ratingAmp }}",
+    poles: "{{ variant.poles }}",
+    partNo230V: "{{ variant.partNo230V }}",
+    partNo400V: "{{ variant.partNo400V }}",
+    productDataSheetLink: {% if variant.pdf_link %}group_{{ outer_index }}_pdf_{{ loop.index }}{% else %}null{% endif %}
+  },
+  {% endfor %}
+];
+const partNumbers{{ loop.index }} = variants{{ loop.index }}.map(v => v.partNo230V !== "-" ? v.partNo230V : v.partNo400V);
+{% endfor %}
+
+---
+
+<Layout>
+  <HeaderText pageHeading="{{ page_heading }}" pageCaption="" />
+
+  {% for product_group in product_groups %}
+  {% if loop.index > 1 %}
+  <div class="my-10"></div>
+  {% endif %}
+
+  <ProductShowcaseDescription
+    images={product{{ loop.index }}.images}
+    title={product{{ loop.index }}.title}
+    description={product{{ loop.index }}.description}
+    partNumbers={partNumbers{{ loop.index }}}
+    client:load
+  />
+
+  <section class="lg:px-4 lg:mx-25 flex flex-col gap-2 mt-10">
+      <ProductVariantsTable variants={variants{{ loop.index }}} client:load />
+  </section>
+  {% endfor %}
+
+</Layout>

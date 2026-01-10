@@ -1,0 +1,81 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import HeaderText from "../../../components/HeaderText";
+import productImage from "{{ product_image }}";
+import diagramImage from "{{ diagram_image }}";
+
+const product = {
+  images: [
+    productImage.src
+  ],
+  title: "{{ title }}",
+  description: "{{ description }}"
+};
+---
+
+<Layout>
+  <HeaderText pageHeading={product.title} pageCaption="" />
+  
+  <div class="w-full max-w-7xl mx-auto px-4 lg:px-10 py-10 flex flex-col gap-10">
+      
+      {/* Top Section - Two Halves */}
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+        
+        {/* Left Half - Product Image & Description Image */}
+        <div class="flex flex-col gap-6">
+             <div class="bg-gray-100 rounded-lg p-6 flex justify-center items-center h-full min-h-[400px]">
+                 <img src={product.images[0]} alt={product.title} class="max-w-full max-h-[400px] object-contain" />
+             </div>
+             
+             <div class="overflow-x-auto shadow-sm rounded-lg border border-gray-200">
+                <table class="min-w-full bg-white border-collapse">
+                    <thead>
+                      <tr class="bg-brand-color text-white uppercase text-sm leading-normal">
+                        <th scope="col" class="px-6 py-3 border-r border-gray-200 font-semibold text-left" colspan="2">Data</th>
+                      </tr>
+                    </thead>
+                    <tbody class="text-gray-900 text-sm">
+                      {% for row in data_table_rows %}
+                      <tr class="border-b border-gray-200 hover:bg-gray-50 transition-colors">
+                        <td class="px-6 py-3 font-medium border-r border-gray-200 whitespace-nowrap w-1/3">{{ row.label }}</td>
+                        <td class="px-6 py-3">{{ row.value }}</td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+             </div>
+        </div>
+
+        {/* Right Half - Engineering Diagram & Spec Table */}
+        <div class="flex flex-col gap-6">
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 flex justify-center items-center">
+                 <img src={diagramImage.src} alt="Engineering Diagram" class="max-w-full h-auto object-contain" />
+            </div>
+             <div class="overflow-x-auto shadow-sm rounded-lg border border-gray-200">
+                <table class="min-w-full bg-white border-collapse">
+                  <thead>
+                    <tr class="bg-brand-color text-white uppercase text-sm leading-normal">
+                      <th scope="col" class="px-6 py-3 border-r border-gray-200 font-semibold text-left" colspan="2">Specification</th>
+                    </tr>
+                  </thead>
+                  <tbody class="text-gray-900 text-sm">
+                    {% for row in spec_table_rows %}
+                    <tr class="border-b border-gray-200 hover:bg-gray-50 transition-colors">
+                      <td class="px-6 py-4 font-medium border-r border-gray-200 whitespace-nowrap w-1/3">{{ row.label }}</td>
+                      <td class="px-6 py-4">
+                        {% if row.is_ex_rating %}
+                        <span class="inline-flex items-center justify-center w-6 h-6 border border-black rounded-sm text-xs font-bold mr-2 select-none">Ex</span>
+                        {% endif %}
+                         {{ row.value }}
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+            </div>
+        </div>
+
+      </div>
+
+  </div>
+</Layout>

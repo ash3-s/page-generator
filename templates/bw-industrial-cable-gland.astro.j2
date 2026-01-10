@@ -1,0 +1,61 @@
+---
+import Layout from "../../../../layouts/Layout.astro";
+import HeaderText from "../../../../components/HeaderText";
+
+import ProductShowcaseCompareVertical from "../../../../components/ProductShowcaseCompareVertical";
+import type {
+  ProductData,
+} from "../../../../components/ProductShowcaseCompareVertical";
+
+{% for img in raychem.images %}
+import raychem_img_{{ loop.index }} from "{{ img }}";
+{% endfor %}
+{% for img in raychem.tech_details %}
+import raychem_tech_{{ loop.index }} from "{{ img }}";
+{% endfor %}
+{% for img in raychem.spec %}
+import raychem_spec_{{ loop.index }} from "{{ img }}";
+{% endfor %}
+
+{% for img in speedwell.images %}
+import speedwell_img_{{ loop.index }} from "{{ img }}";
+{% endfor %}
+{% for img in speedwell.tech_details %}
+import speedwell_tech_{{ loop.index }} from "{{ img }}";
+{% endfor %}
+{% for img in speedwell.spec %}
+import speedwell_spec_{{ loop.index }} from "{{ img }}";
+{% endfor %}
+
+const productName = "{{ title }}";
+
+const raychemRPG: ProductData = {
+  id: "Raychem-RPG",
+  title: "Raychem RPG",
+  images: [{% for img in raychem.images %}raychem_img_{{ loop.index }}.src, {% endfor %}], 
+  technicalDataImages: [{% for img in raychem.tech_details %}raychem_tech_{{ loop.index }}.src, {% endfor %}],
+  specImages: [{% for img in raychem.spec %}raychem_spec_{{ loop.index }}.src, {% endfor %}],
+  applicationData: "",
+  description: "",
+};
+
+// --- Product 2 Data: Speedwell RPG ---
+const speedwellRPG: ProductData = {
+  id: "Speedwell",
+  title: "Speedwell",
+  images: [{% for img in speedwell.images %}speedwell_img_{{ loop.index }}.src, {% endfor %}], 
+  technicalDataImages: [{% for img in speedwell.tech_details %}speedwell_tech_{{ loop.index }}.src, {% endfor %}],
+  specImages: [{% for img in speedwell.spec %}speedwell_spec_{{ loop.index }}.src, {% endfor %}],
+  applicationData: "",
+  description: "",
+};
+---
+
+<Layout>
+  <HeaderText
+    pageHeading={productName}
+    pageCaption=""
+  />
+
+  <ProductShowcaseCompareVertical products={[raychemRPG, speedwellRPG]} client:load />
+</Layout>
