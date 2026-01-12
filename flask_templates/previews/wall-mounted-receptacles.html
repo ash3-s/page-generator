@@ -6,9 +6,14 @@ HeaderText, ProductShowcaseDescription, ProductVariantsTable %} {% block content
   <div class="mb-12">
     <h2 class="text-2xl font-bold px-4 lg:px-10 mb-4">{{ group.title }}</h2>
 
+    {% set partNumbers = [] %} {% for variant in group.variants %} {% if
+    variant.partNo230V != "-" and variant.partNo230V %} {% set _ =
+    partNumbers.append(variant.partNo230V) %} {% elif variant.partNo400V != "-"
+    and variant.partNo400V %} {% set _ = partNumbers.append(variant.partNo400V)
+    %} {% else %} {% set _ = partNumbers.append("") %} {% endif %} {% endfor %}
     {{ ProductShowcaseDescription( images=group.images, title=group.title,
-    description=group.description ) }} {{ ProductVariantsTable(group.variants)
-    }}
+    description=group.description, partNumbers=partNumbers ) }} {{
+    ProductVariantsTable(group.variants, group.title) }}
   </div>
   {% endfor %}
 </div>

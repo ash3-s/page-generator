@@ -1,5 +1,5 @@
 {% extends "preview_layout.html" %} {% from 'preview_macros.html' import
-HeaderText %} {% block content %}
+HeaderText, ProductActions %} {% block content %}
 <div class="bg-white min-h-screen pb-12">
   {{ HeaderText(title, "") }}
 
@@ -19,6 +19,8 @@ HeaderText %} {% block content %}
             class="max-w-full max-h-[400px] object-contain"
           />
         </div>
+
+        {{ ProductActions(None, pdf_file_path) }}
 
         <div
           class="overflow-x-auto shadow-sm rounded-lg border border-gray-200"

@@ -150,7 +150,8 @@ TEMPLATE_CONFIG = {
                         {"key": "is_ex_rating", "label": "Is Ex Rating", "type": "checkbox"},
                     ]
                 }
-            }
+            },
+            {"key": "pdf_file_path", "label": "Brochure PDF", "type": "file"},
         ]
     },
     "wall-mounted-receptacles.astro.j2": {

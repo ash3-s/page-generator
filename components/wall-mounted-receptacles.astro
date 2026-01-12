@@ -1,0 +1,355 @@
+---
+import Layout from "../../../../layouts/Layout.astro";
+import HeaderText from "../../../../components/HeaderText";
+import ProductShowcaseDescription from "../../../../components/ProductShowcaseDescription";
+import ProductVariantsTable from "../../../../components/ProductVariantsTable";
+
+import img1341 from "../../../../assets/Mennekes Pictures/1341.png";
+import img1343 from "../../../../assets/Mennekes Pictures/1343.png";
+import img31 from "../../../../assets/Mennekes Pictures/31.png";
+import img1346 from "../../../../assets/Mennekes Pictures/1346.png";
+import img1348 from "../../../../assets/Mennekes Pictures/1348.png";
+import img32 from "../../../../assets/Mennekes Pictures/32.png";
+import img1137A from "../../../../assets/Mennekes Pictures/1137A.png";
+import img1141A from "../../../../assets/Mennekes Pictures/1141A.png";
+import img1145A from "../../../../assets/Mennekes Pictures/1145A.png";
+
+import pdf1341 from "../../../../assets/Mennekes/CEE RECEPTACLES/1341_en.pdf";
+import pdf1343 from "../../../../assets/Mennekes/CEE RECEPTACLES/1343.pdf";
+import pdf31 from "../../../../assets/Mennekes/CEE RECEPTACLES/31.pdf";
+import pdf1346 from "../../../../assets/Mennekes/CEE RECEPTACLES/1346.pdf";
+import pdf1348 from "../../../../assets/Mennekes/CEE RECEPTACLES/1348.pdf";
+import pdf32 from "../../../../assets/Mennekes/CEE RECEPTACLES/32.pdf";
+import pdf1137A from "../../../../assets/Mennekes/CEE RECEPTACLES/1137A.pdf";
+import pdf1141 from "../../../../assets/Mennekes/CEE RECEPTACLES/1141.pdf";
+import pdf1145 from "../../../../assets/Mennekes/CEE RECEPTACLES/1145.pdf";
+
+
+
+
+import img9105 from "../../../../assets/Mennekes Pictures/9105_2.png";
+import img9122 from "../../../../assets/Mennekes Pictures/9122_2.png";
+import img9142 from "../../../../assets/Mennekes Pictures/9142_2.png";
+import img9151 from "../../../../assets/Mennekes Pictures/9151_2.png";
+import img9172 from "../../../../assets/Mennekes Pictures/9172_2.png";
+import img9182 from "../../../../assets/Mennekes Pictures/9182_2.png";
+import img128A from "../../../../assets/Mennekes Pictures/128A.png";
+import img132A from "../../../../assets/Mennekes Pictures/132A.png";
+import img136A from "../../../../assets/Mennekes Pictures/136A.png";
+
+import pdf9105 from "../../../../assets/Mennekes/CEE RECEPTACLES/9105.pdf";
+import pdf9122 from "../../../../assets/Mennekes/CEE RECEPTACLES/9122.pdf";
+import pdf9142 from "../../../../assets/Mennekes/CEE RECEPTACLES/9142.pdf";
+import pdf9151 from "../../../../assets/Mennekes/CEE RECEPTACLES/9151.pdf";
+import pdf9172 from "../../../../assets/Mennekes/CEE RECEPTACLES/9172_en_GB.pdf";
+import pdf9182 from "../../../../assets/Mennekes/CEE RECEPTACLES/9182.pdf";
+import pdf128A from "../../../../assets/Mennekes/CEE RECEPTACLES/128A.pdf";
+import pdf132 from "../../../../assets/Mennekes/CEE RECEPTACLES/132.pdf";
+import pdf136A from "../../../../assets/Mennekes/CEE RECEPTACLES/136A.pdf";
+
+import img139_2 from "../../../../assets/Mennekes Pictures/139_2.png";
+import img143 from "../../../../assets/Mennekes Pictures/143.png";
+
+import pdf139 from "../../../../assets/Mennekes/CEE RECEPTACLES/139.pdf";
+import pdf143 from "../../../../assets/Mennekes/CEE RECEPTACLES/143.pdf";
+
+const product = {
+  images: [
+    img1341.src,
+    img1343.src,
+    img31.src,
+    img1346.src,
+    img1348.src,
+    img32.src,
+    img1137A.src,
+    img1141A.src,
+    img1145A.src
+  ],
+  title: "CEE wall mounted receptacles",
+  description: [
+    "16 A - 32 A: screwless, with TwinCONTACT, top entry ",
+    "63 A: X-CONTACT with screw terminals, top and bottom entry"
+  ]
+};
+
+// Placeholder data - please update with values from the attached image
+const variants = [
+  {
+    protectionType: "IP 44",
+    ratingAmp: "16",
+    poles: "2+E",
+    partNo230V: "1341",
+    partNo400V: "-",
+    productDataSheetLink: pdf1341,
+    image: img1341.src
+  },
+  {
+    protectionType: "IP 44",
+    ratingAmp: "16",
+    poles: "3+E",
+    partNo230V: "-",
+    partNo400V: "1343",
+    productDataSheetLink: pdf1343,
+    image: img1343.src
+  },
+  {
+    protectionType: "IP 44",
+    ratingAmp: "16",
+    poles: "3+N+E",
+    partNo230V: "-",
+    partNo400V: "31",
+    productDataSheetLink: pdf31,
+    image: img31.src
+  },
+  {
+    protectionType: "IP 44",
+    ratingAmp: "32",
+    poles: "2+E",
+    partNo230V: "1346",
+    partNo400V: "-",
+    productDataSheetLink: pdf1346,
+    image: img1346.src
+  },
+  {
+    protectionType: "IP 44",
+    ratingAmp: "32",
+    poles: "3+E",
+    partNo230V: "-",
+    partNo400V: "1348",
+    productDataSheetLink: pdf1348,
+    image: img1348.src
+  },
+   {
+    protectionType: "IP 44",
+    ratingAmp: "32",
+    poles: "3+N+E",
+    partNo230V: "-",
+    partNo400V: "32",
+    productDataSheetLink: pdf32,
+    image: img32.src
+  },
+  {
+    protectionType: "IP 44",
+    ratingAmp: "63",
+    poles: "2+E",
+    partNo230V: " 1137A",
+    partNo400V: "-",
+    productDataSheetLink: pdf1137A,
+    image: img1137A.src
+  },
+  {
+    protectionType: "IP 44",
+    ratingAmp: "63",
+    poles: "3+E",
+    partNo230V: "-",
+    partNo400V: "1141A",
+    productDataSheetLink: pdf1141,
+    image: img1141A.src
+  },
+  {
+    protectionType: "IP 44",
+    ratingAmp: "63",
+    poles: "3+N+E",
+    partNo230V: "-",
+    partNo400V: "1145A",
+    productDataSheetLink: pdf1145,
+    image: img1145A.src
+  }
+];
+const partNumbers = variants.map(v => v.partNo230V !== "-" ? v.partNo230V : v.partNo400V);
+
+
+const product2 = {
+  images: [
+    img9105.src,
+    img9122.src,
+    img9142.src,
+    img9151.src,
+    img9172.src,
+    img9182.src,
+    img128A.src,
+    img132A.src,
+    img136A.src
+  ],
+  title: "",
+  description: [
+    "16 A - 32 A: screwless, with TwinCONTACT, top entry ",
+    "63 A - 125 A: X-CONTACT with screw terminals, top and bottom entry"
+  ]
+};
+
+const variants2 = [
+  {
+    protectionType: "IP 67",
+    ratingAmp: "16",
+    poles: "2+E",
+    partNo230V: "9105",
+    partNo400V: "-",
+    productDataSheetLink: pdf9105,
+    image: img9105.src
+  },
+  {
+    protectionType: "IP 67",
+    ratingAmp: "16",
+    poles: "3+E",
+    partNo230V: "-",
+    partNo400V: "9122",
+    productDataSheetLink: pdf9122,
+    image: img9122.src
+  },
+  {
+    protectionType: "IP 67",
+    ratingAmp: "16",
+    poles: "3+N+E",
+    partNo230V: "-",
+    partNo400V: "9142",
+    productDataSheetLink: pdf9142,
+    image: img9142.src
+  },
+  {
+    protectionType: "IP 67",
+    ratingAmp: "32",
+    poles: "2+E",
+    partNo230V: "9151",
+    partNo400V: "-",
+    productDataSheetLink: pdf9151,
+    image: img9151.src
+  },
+  {
+    protectionType: "IP 67",
+    ratingAmp: "32",
+    poles: "3+E",
+    partNo230V: "-",
+    partNo400V: "9172",
+    productDataSheetLink: pdf9172,
+    image: img9172.src
+  },
+   {
+    protectionType: "IP 67",
+    ratingAmp: "32",
+    poles: "3+N+E",
+    partNo230V: "-",
+    partNo400V: "9182",
+    productDataSheetLink: pdf9182,
+    image: img9182.src
+  },
+  {
+    protectionType: "IP 67",
+    ratingAmp: "63",
+    poles: "2+E",
+    partNo230V: " 128A",
+    partNo400V: "-",
+    productDataSheetLink: pdf128A,
+    image: img128A.src
+  },
+  {
+    protectionType: "IP 67",
+    ratingAmp: "63",
+    poles: "3+E",
+    partNo230V: "-",
+    partNo400V: "132A",
+    productDataSheetLink: pdf132,
+    image: img132A.src
+  },
+  {
+    protectionType: "IP 67",
+    ratingAmp: "63",
+    poles: "3+N+E",
+    partNo230V: "-",
+    partNo400V: "136A",
+    productDataSheetLink: pdf136A,
+    image: img136A.src
+  }
+];
+const partNumbers2 = variants2.map(v => v.partNo230V !== "-" ? v.partNo230V : v.partNo400V);
+
+const product3 = {
+  images: [
+    img139_2.src,
+    img139_2.src,
+    img143.src
+  ],
+  title: "",
+  description: [
+    "X-CONTACT, top and bottom entry "
+  ]
+};
+
+const variants3 = [
+  {
+    protectionType: "IP 67",
+    ratingAmp: "125",
+    poles: "2+E",
+    partNo230V: "24464",
+    partNo400V: "-",
+    productDataSheetLink: pdf139,
+    image: img139_2.src
+  },
+  {
+    protectionType: "IP 67",
+    ratingAmp: "125",
+    poles: "3+E",
+    partNo230V: "-",
+    partNo400V: "139",
+    productDataSheetLink: pdf139,
+    image: img139_2.src
+  },
+  {
+    protectionType: "IP 67",
+    ratingAmp: "125",
+    poles: "3+N+E",
+    partNo230V: "-",
+    partNo400V: "143",
+    productDataSheetLink: pdf143,
+    image: img143.src
+  }
+];
+const partNumbers3 = variants3.map(v => v.partNo230V !== "-" ? v.partNo230V : v.partNo400V);
+---
+
+<Layout>
+  <HeaderText pageHeading={product.title} pageCaption="" />
+
+  <ProductShowcaseDescription
+    images={product.images}
+    title={product.title}
+    description={product.description}
+    partNumbers={partNumbers}
+    pdfLinks={variants.map(v => v.productDataSheetLink)}
+    client:load
+  />
+
+  <section class="lg:px-4 lg:mx-25 flex flex-col gap-2 mt-10">
+      <ProductVariantsTable variants={variants} productTitle={product.title} client:load />
+  </section>
+
+  <div class="my-10"></div>
+
+  <ProductShowcaseDescription
+    images={product2.images}
+    title={product2.title}
+    description={product2.description}
+    partNumbers={partNumbers2}
+    pdfLinks={variants2.map(v => v.productDataSheetLink)}
+    client:load
+  />
+
+  <section class="lg:px-4 lg:mx-25 flex flex-col gap-2 mt-10">
+      <ProductVariantsTable variants={variants2} productTitle={product2.title || product.title} client:load />
+  </section>
+
+  <div class="my-10"></div>
+
+  <ProductShowcaseDescription
+    images={product3.images}
+    title={product3.title}
+    description={product3.description}
+    partNumbers={partNumbers3}
+    pdfLinks={variants3.map(v => v.productDataSheetLink)}
+    client:load
+  />
+
+  <section class="lg:px-4 lg:mx-25 flex flex-col gap-2 mt-10">
+      <ProductVariantsTable variants={variants3} productTitle={product3.title || product.title} client:load />
+  </section>
+</Layout>

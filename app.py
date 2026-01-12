@@ -92,6 +92,8 @@ def generate():
                 
                 # Special handling for caution spotlight v2 (assumed 1 level shallower)
                 if filename == 'caution-spotlight-fittings-v2.astro.j2':
+                    if base.lower().endswith('.pdf'):
+                         return f"../../../assets/hazardous-area-solutions/pdf/{base}"
                     return f"../../../assets/{base}"
                 
                 # Special handling for air rod to tape coupling
@@ -164,6 +166,8 @@ def preview():
                 
                 # Special handling for caution spotlight v2 (assumed 1 level shallower)
                 if filename == 'caution-spotlight-fittings-v2.astro.j2':
+                    if base.lower().endswith('.pdf'):
+                         return f"../../../assets/hazardous-area-solutions/pdf/{base}"
                     return f"../../../assets/{base}"
                 
                 # Special handling for air rod to tape coupling

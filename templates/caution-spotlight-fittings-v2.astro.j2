@@ -3,6 +3,8 @@ import Layout from "../../../layouts/Layout.astro";
 import HeaderText from "../../../components/HeaderText";
 import productImage from "{{ product_image }}";
 import diagramImage from "{{ diagram_image }}";
+import ProductActions from "../../../components/ProductActions";
+import pdfFile from "{{ pdf_file_path }}";
 
 const product = {
   images: [
@@ -10,6 +12,12 @@ const product = {
   ],
   title: "{{ title }}",
   description: "{{ description }}"
+};
+
+const actionProduct = {
+  title: product.title,
+  description: product.description,
+  image: product.images[0],
 };
 ---
 
@@ -27,6 +35,8 @@ const product = {
                  <img src={product.images[0]} alt={product.title} class="max-w-full max-h-[400px] object-contain" />
              </div>
              
+             <ProductActions client:load product={actionProduct} pdfUrl={pdfFile} />
+
              <div class="overflow-x-auto shadow-sm rounded-lg border border-gray-200">
                 <table class="min-w-full bg-white border-collapse">
                     <thead>

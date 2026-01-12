@@ -92,17 +92,27 @@ interface ProductShowcaseDescriptionProps {
     images: string[];
     title: string;
     description: string[];
+    partNumbers?: string[];
 }
 
-export function ProductShowcaseDescription({ images, title, description }: ProductShowcaseDescriptionProps) {
+export function ProductShowcaseDescription({ images, title, description, partNumbers }: ProductShowcaseDescriptionProps) {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
     const handleAddToList = () => {
+        let itemTitle = title;
+        let itemId = title;
+
+        if (partNumbers && partNumbers[currentImageIndex]) {
+            const partNo = partNumbers[currentImageIndex];
+            itemTitle = `${title} - Part No: ${partNo}`;
+            itemId = itemTitle;
+        }
+
         addItem({
-            id: title, // Using title as ID for now as it seems unique enough in this context
-            title,
+            id: itemId,
+            title: itemTitle,
             description: description.join("\n"),
-            image: images[0],
+            image: images[currentImageIndex],
         });
         toast.success("Added to list!");
     };
@@ -116,13 +126,23 @@ export function ProductShowcaseDescription({ images, title, description }: Produ
         <div className="w-full max-w-7xl mx-auto px-4 lg:px-10 py-6 grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Left - Images */}
             <div>
-                <div className="w-full bg-gray-100 overflow-hidden flex items-center justify-center h-48 md:h-64">
-                    <img src={images[currentImageIndex]} className="object-contain p-4 w-full h-full" />
+                <div className="w-full bg-gray-100 overflow-hidden flex items-center justify-center h-48 md:h-64 flex-col gap-4 p-4">
+                    <img src={images[currentImageIndex]} className="object-contain w-full h-full max-h-[80%]" />
+
                 </div>
 
 
+                {/* Part Number Pill */}
+                {partNumbers && partNumbers[currentImageIndex] && (
+                    <div className="flex justify-center mt-2 mb-2">
+                        <span className="bg-gray-100 text-gray-800 px-4 py-1 rounded-full text-sm font-medium border border-gray-200">
+                            Part No: {partNumbers[currentImageIndex]}
+                        </span>
+                    </div>
+                )}
+
                 {/* Thumbnails */}
-                <div className="flex flex-wrap gap-3 mt-4">
+                <div className="flex flex-wrap gap-3 mt-4 justify-center">
                     {images.map((img, idx) => (
                         <button
                             key={idx}

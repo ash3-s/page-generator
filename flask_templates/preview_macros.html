@@ -66,18 +66,32 @@ description) %}
     </div>
   </div>
 </div>
-{% endmacro %} {% macro ProductShowcaseDescription(images, title, description)
-%}
+{% endmacro %} {% macro ProductShowcaseDescription(images, title, description,
+partNumbers) %}
 <div
   class="w-full max-w-7xl mx-auto px-4 lg:px-10 py-6 grid grid-cols-1 lg:grid-cols-2 gap-8"
 >
   <div>
     <div
-      class="w-full bg-gray-100 overflow-hidden flex items-center justify-center h-48 md:h-64"
+      class="w-full bg-gray-100 overflow-hidden flex items-center justify-center p-4 flex-col gap-4 h-48 md:h-64"
     >
-      <img src="{{ images[0] }}" class="object-contain p-4 w-full h-full" />
+      <img
+        src="{{ images[0] }}"
+        class="object-contain w-full h-full max-h-[80%]"
+      />
     </div>
-    <div class="flex flex-wrap gap-3 mt-4">
+
+    {% if partNumbers and partNumbers[0] %}
+    <div class="flex justify-center mt-2 mb-2">
+      <span
+        class="bg-gray-100 text-gray-800 px-4 py-1 rounded-full text-sm font-medium border border-gray-200"
+      >
+        Part No: {{ partNumbers[0] }}
+      </span>
+    </div>
+    {% endif %}
+
+    <div class="flex flex-wrap gap-3 mt-4 justify-center">
       {% for img in images %}
       <button
         class="w-20 h-20 border-2 overflow-hidden transition border-gray-300"
@@ -115,7 +129,7 @@ description) %}
     </div>
   </div>
 </div>
-{% endmacro %} {% macro ProductVariantsTable(variants) %}
+{% endmacro %} {% macro ProductVariantsTable(variants, productTitle) %}
 <div class="overflow-x-auto w-full my-8 px-4 lg:px-10">
   <table
     class="min-w-full bg-white border border-gray-200 rounded-lg shadow-sm"
@@ -150,9 +164,13 @@ description) %}
         >
           400 V 50 and 60 Hz
         </th>
-        <th rowspan="2" class="py-3 px-6 text-center font-semibold">
+        <th
+          rowspan="2"
+          class="py-3 px-6 text-center border-r border-gray-200 font-semibold"
+        >
           Product Data Sheet
         </th>
+        <th rowspan="2" class="py-3 px-6 text-center font-semibold">Actions</th>
       </tr>
       <tr class="bg-blue-600 text-white uppercase text-sm leading-normal">
         <th
@@ -187,12 +205,67 @@ description) %}
         <td class="py-3 px-6 text-center border-r border-gray-200">
           {{ variant.partNo400V or "-" }}
         </td>
-        <td class="py-3 px-6 text-center">
+        <td class="py-3 px-6 text-center border-r border-gray-200">
           <button
-            class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-xs font-bold uppercase cursor-pointer"
+            class="inline-flex items-center gap-2 px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors text-xs font-bold uppercase cursor-pointer"
           >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="2"
+              stroke="currentColor"
+              class="w-4 h-4"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"
+              />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+              />
+            </svg>
             View
           </button>
+        </td>
+        <td class="py-3 px-6 text-center">
+          <div class="flex justify-center gap-2">
+            <button
+              class="p-2 bg-gray-200 rounded-full hover:bg-gray-300 transition-colors"
+              title="Add to List"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-4 w-4 text-gray-700"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 4v16m8-8H4"
+                />
+              </svg>
+            </button>
+            <button
+              class="p-2 bg-gray-200 rounded-full hover:bg-gray-300 transition-colors"
+              title="Enquire Now"
+            >
+              <img src="/enquire.svg" class="w-4 h-4" alt="Enquire" />
+            </button>
+            <a
+              href="#"
+              class="p-2 bg-gray-200 rounded-full hover:bg-gray-300 transition-colors flex items-center justify-center"
+              title="Download Brochure"
+            >
+              <img src="/download.svg" class="w-4 h-4" alt="Download" />
+            </a>
+          </div>
         </td>
       </tr>
       {% endfor %}
@@ -321,5 +394,33 @@ description) %}
     </div>
     {% endfor %}
   </div>
+</div>
+{% endmacro %} {% macro ProductActions(product, pdfUrl) %}
+<div class="flex flex-wrap gap-4 mt-6">
+  <button
+    class="flex items-center gap-2 px-6 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors cursor-pointer text-gray-800 font-medium"
+  >
+    + Add to List
+  </button>
+  <button
+    class="flex items-center gap-2 px-6 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors cursor-pointer text-gray-800 font-medium"
+  >
+    Enquire Now
+  </button>
+  {% if pdfUrl %}
+  <a
+    href="{{ pdfUrl }}"
+    class="flex items-center gap-2 px-6 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors cursor-pointer text-gray-800 font-medium"
+    target="_blank"
+  >
+    Download Brochure
+  </a>
+  {% else %}
+  <button
+    class="flex items-center gap-2 px-6 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors cursor-pointer text-gray-800 font-medium"
+  >
+    Download Brochure
+  </button>
+  {% endif %}
 </div>
 {% endmacro %}
