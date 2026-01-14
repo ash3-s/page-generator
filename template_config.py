@@ -134,6 +134,17 @@ TEMPLATE_CONFIG = {
                     "fields": [
                         {"key": "label", "label": "Label", "type": "text"},
                         {"key": "value", "label": "Value", "type": "text"},
+                        {
+                            "key": "sub_rows",
+                            "label": "Sub Rows (Same Label)",
+                            "type": "list",
+                            "item_schema": {
+                                "type": "object",
+                                "fields": [
+                                    {"key": "value", "label": "Value", "type": "text"}
+                                ]
+                            }
+                        }
                     ]
                 }
             },
@@ -147,6 +158,18 @@ TEMPLATE_CONFIG = {
                         {"key": "label", "label": "Label", "type": "text"},
                         {"key": "value", "label": "Value", "type": "text"},
                         {"key": "is_ex_rating", "label": "Is Ex Rating", "type": "checkbox"},
+                        {
+                            "key": "sub_rows",
+                            "label": "Sub Rows (Same Label)",
+                            "type": "list",
+                            "item_schema": {
+                                "type": "object",
+                                "fields": [
+                                    {"key": "value", "label": "Value", "type": "text"},
+                                    {"key": "is_ex_rating", "label": "Is Ex Rating", "type": "checkbox"}
+                                ]
+                            }
+                        }
                     ]
                 }
             },

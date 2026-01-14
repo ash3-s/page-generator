@@ -40,18 +40,29 @@ HeaderText, ProductActions %} {% block content %}
               </tr>
             </thead>
             <tbody class="text-gray-900 text-sm">
-              {% for row in data_table_rows %}
+              {% for row in data_table_rows %} {% set rowspan = 1 %} {% if
+              row.sub_rows %} {% set rowspan = rowspan + row.sub_rows|length %}
+              {% endif %}
               <tr
                 class="border-b border-gray-200 hover:bg-gray-50 transition-colors"
               >
                 <td
                   class="px-6 py-3 font-medium border-r border-gray-200 whitespace-nowrap w-1/3"
+                  {%
+                  if
+                  rowspan
                 >
-                  {{ row.label }}
+                  1 %}rowspan="{{ rowspan }}"{% endif %} > {{ row.label }}
                 </td>
                 <td class="px-6 py-3">{{ row.value }}</td>
               </tr>
-              {% endfor %}
+              {% if row.sub_rows %} {% for sub in row.sub_rows %}
+              <tr
+                class="border-b border-gray-200 hover:bg-gray-50 transition-colors"
+              >
+                <td class="px-6 py-3">{{ sub.value }}</td>
+              </tr>
+              {% endfor %} {% endif %} {% endfor %}
             </tbody>
           </table>
         </div>
@@ -86,14 +97,19 @@ HeaderText, ProductActions %} {% block content %}
               </tr>
             </thead>
             <tbody class="text-gray-900 text-sm">
-              {% for row in spec_table_rows %}
+              {% for row in spec_table_rows %} {% set rowspan = 1 %} {% if
+              row.sub_rows %} {% set rowspan = rowspan + row.sub_rows|length %}
+              {% endif %}
               <tr
                 class="border-b border-gray-200 hover:bg-gray-50 transition-colors"
               >
                 <td
                   class="px-6 py-4 font-medium border-r border-gray-200 whitespace-nowrap w-1/3"
+                  {%
+                  if
+                  rowspan
                 >
-                  {{ row.label }}
+                  1 %}rowspan="{{ rowspan }}"{% endif %} > {{ row.label }}
                 </td>
                 <td class="px-6 py-4">
                   {% if row.is_ex_rating %}
@@ -104,7 +120,20 @@ HeaderText, ProductActions %} {% block content %}
                   {% endif %} {{ row.value }}
                 </td>
               </tr>
-              {% endfor %}
+              {% if row.sub_rows %} {% for sub in row.sub_rows %}
+              <tr
+                class="border-b border-gray-200 hover:bg-gray-50 transition-colors"
+              >
+                <td class="px-6 py-4">
+                  {% if sub.is_ex_rating %}
+                  <span
+                    class="inline-flex items-center justify-center w-6 h-6 border border-black rounded-sm text-xs font-bold mr-2 select-none"
+                    >Ex</span
+                  >
+                  {% endif %} {{ sub.value }}
+                </td>
+              </tr>
+              {% endfor %} {% endif %} {% endfor %}
             </tbody>
           </table>
         </div>
