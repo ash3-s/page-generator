@@ -123,7 +123,6 @@ TEMPLATE_CONFIG = {
         "name": "Warom products comparison page (side-by-side view with tables)",
         "structure": [
             {"key": "title", "label": "Title", "type": "text"},
-            {"key": "description", "label": "Description", "type": "text"},
             {"key": "product_image", "label": "Product Image", "type": "image"},
             {"key": "diagram_image", "label": "Diagram Image", "type": "image"},
             {
