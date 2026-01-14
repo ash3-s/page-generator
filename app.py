@@ -1,5 +1,6 @@
 import os
 import json
+import hashlib
 from flask import Flask, render_template, request, jsonify, send_file
 from jinja2 import Environment, FileSystemLoader
 
@@ -31,17 +32,27 @@ def template_form(filename):
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
-    if 'file' not in request.files:
-        return jsonify({'error': 'No file part'}), 400
-    file = request.files['file']
-    if file.filename == '':
-        return jsonify({'error': 'No selected file'}), 400
-    
-    # Save file
-    filepath = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
-    file.save(filepath)
-    
-    # Return relative path for use in template
+    try:
+        if 'file' not in request.files:
+            return jsonify({'error': 'No file part'}), 400
+        file = request.files['file']
+        if file.filename == '':
+            return jsonify({'error': 'No selected file'}), 400
+        
+        # Calculate hash to append to filename
+        file_content = file.read()
+        file_hash = hashlib.sha256(file_content).hexdigest()
+        file.seek(0)
+        
+        name, ext = os.path.splitext(file.filename)
+        new_filename = f"{name}_{file_hash}{ext}"
+        
+        # Save file
+        abs_upload_folder = os.path.abspath(app.config['UPLOAD_FOLDER'])
+        filepath = os.path.join(abs_upload_folder, new_filename)
+        file.save(filepath)
+
+        # Return relative path for use in template
     # Assuming the astro files are in the root or headers set paths correctly, 
     # but usually we want a path relative to the final project structure.
     # For now, let's return the absolute path or a relative path that works.
@@ -63,8 +74,10 @@ def upload_file():
     # Return path relative to the final project structure as requested.
     # The user wants imports to look like: import img from "../../../../assets/filename"
     
-    project_asset_path = f"../../../../assets/{file.filename}"
-    return jsonify({'url': project_asset_path, 'filename': file.filename})
+        project_asset_path = f"../../../../assets/{new_filename}"
+        return jsonify({'url': project_asset_path, 'filename': new_filename})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/generate', methods=['POST'])
 def generate():
